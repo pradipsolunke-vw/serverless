@@ -8,8 +8,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.function.adapter.aws.FunctionInvoker;
+import org.springframework.cloud.function.context.FunctionRegistry;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -30,6 +33,7 @@ public class MyBookingAppApplication {
     }
 
     @Bean
+    @Secured("ROLE_USER")
     public Function<Request, Response> createBooking() {
         return request -> {
             String username = request.getUsername();
@@ -53,14 +57,15 @@ public class MyBookingAppApplication {
 
     }
 
-    @Bean
-    public Consumer<Integer> cancelBooking(){
-        return seatId -> bookingService.cancelBooking(seatId);
-    }
+//    @Bean
+//    public FunctionInvoker functionInvoker(FunctionRegistry registry) {
+//        registry.register(FunctionRegistration.<Request, Response>builder()
+//                .id("createBooking") // Set a unique identifier
+//                .function(createBooking()) // Reference the function
+//                .type(FunctionType.REQUEST_RESPONSE) // Specify the function type
+//                .build());
+//        return functionInvoker;
+//    }
 
-    @Bean
-    public Supplier<List<Seat>> getAllBooking(){
-        return ()-> bookingService.findAll();
-    }
 
 }
